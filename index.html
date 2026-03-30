@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -131,7 +130,7 @@
         }
         @keyframes textGlitch {
             0% { transform: skew(0deg, 0deg); text-shadow: 0.03em 0 0 #ff00ff, -0.03em -0.01em 0 #00ffff; }
-100% { transform: skew(0.5deg, -0.3deg); text-shadow: -0.03em 0.01em 0 #ff00ff, 0.03em 0.02em 0 #00ffff; }
+            100% { transform: skew(0.5deg, -0.3deg); text-shadow: -0.03em 0.01em 0 #ff00ff, 0.03em 0.02em 0 #00ffff; }
         }
         .glitch-sub {
             margin-top: 20px;
@@ -495,18 +494,18 @@
                 oscLow.stop(now + 1.3);
                 
                 const bufferSize = 4096;
-                const noiseNode = soundsCtx.createScriptProcessor(bufferSize, 1, 1);
+                const noiseNodeTemp = soundsCtx.createScriptProcessor(bufferSize, 1, 1);
                 const noiseGain = soundsCtx.createGain();
                 noiseGain.gain.value = 0.11;
-                noiseNode.onaudioprocess = function(e) {
+                noiseNodeTemp.onaudioprocess = function(e) {
                     const output = e.outputBuffer.getChannelData(0);
                     for (let i=0; i<bufferSize; i++) output[i] = (Math.random()*2-1)*0.85;
-                    noiseNode.onaudioprocess = null;
+                    noiseNodeTemp.onaudioprocess = null;
                 };
-                noiseNode.connect(noiseGain);
+                noiseNodeTemp.connect(noiseGain);
                 noiseGain.connect(soundsCtx.destination);
                 noiseGain.gain.exponentialRampToValueAtTime(0.0001, now+0.65);
-                setTimeout(()=>{ try{ noiseNode.disconnect(); }catch(e){} }, 700);
+                setTimeout(()=>{ try{ noiseNodeTemp.disconnect(); }catch(e){} }, 700);
                 
                 const oscHi = soundsCtx.createOscillator();
                 const gainHi = soundsCtx.createGain();
@@ -596,7 +595,7 @@
                 ">> SYSTEM ALERT: ANALOG DISTORTION INCREASING",
                 ">> ARTEM HYPERDRIVE: LIVE TRANSMISSION ACTIVE",
                 ">> MESSAGE DECODED: 'FOLLOW THE SIGNAL'"
-                ];
+            ];
             let msgIdx=0;
             function rotateLog() {
                 msgIdx=(msgIdx+1)%messages.length;
@@ -639,9 +638,9 @@
                 isLocked=true;
                 document.body.classList.add('locked');
                 document.querySelectorAll('.win98-link').forEach(link=>{ link.removeAttribute('href'); link.style.pointerEvents='none'; });
-                const cmdInput=document.getElementById('commandInput'); if(cmdInput) cmdInput.disabled=true;
-                const execBtn=document.getElementById('executeCmd'); if(execBtn) execBtn.disabled=true;
-                const noiseBtn=document.getElementById('audioNoiseBtn'); if(noiseBtn) noiseBtn.disabled=true;
+                const cmdInputElem=document.getElementById('commandInput'); if(cmdInputElem) cmdInputElem.disabled=true;
+                const execBtnElem=document.getElementById('executeCmd'); if(execBtnElem) execBtnElem.disabled=true;
+                const noiseBtnElem=document.getElementById('audioNoiseBtn'); if(noiseBtnElem) noiseBtnElem.disabled=true;
                 if(isAudioPlaying) stopStatic();
                 if(scaryInterval) clearInterval(scaryInterval);
                 if(soundsCtx) soundsCtx.suspend();
@@ -664,6 +663,7 @@
                     }
                 },120000);
             }
+
             function triggerHorrorProtocol() {
                 if(isLocked) return;
                 if(isAudioPlaying) stopStatic();
@@ -693,7 +693,7 @@
             const historyDiv=document.getElementById('terminalHistory');
             function addHistoryLine(cmd,resp){
                 const line=document.createElement('div');
-                line.innerHTML=> ${cmd}<br>  ${resp};
+                line.innerHTML = `> ${cmd}<br>  ${resp}`;
                 historyDiv.appendChild(line);
                 historyDiv.scrollTop=historyDiv.scrollHeight;
                 while(historyDiv.children.length>18) historyDiv.removeChild(historyDiv.firstChild);
@@ -715,80 +715,9 @@
             commandInput.addEventListener('keypress',(e)=>{ if(e.key==='Enter' && !isLocked){ e.preventDefault(); processCommand(commandInput.value); } });
 
             // Звуки печати
-            const cmdInput=document.getElementById('commandInput');
-            cmdInput.addEventListener('input',function(e){ if(e.inputType!=='deleteContentBackward' && e.inputType!=='deleteContentForward') playTypingSound(); });
-            cmdInput.addEventListener('keydown',function(e){ if(e.key.length===1 && !e.ctrlKey && !e.altKey) playTypingSound(); });
-
-            // ========== 7. Drag окна, иконки ==========
-            let dragActive=false, dragOffsetX=0, dragOffsetY=0;
-            const windowEl=document.getElementById('artemWindow');
-            const titleBar=document.getElementById('windowTitle');
-            titleBar.addEventListener('mousedown',(e)=>{
-                if(e.target.classList.contains('win98-btn')) return;
-                dragActive=true;
-                dragOffsetX=e.clientX-windowEl.offsetLeft;
-                dragOffsetY=e.clientY-windowEl.offsetTop;
-                windowEl.style.position='absolute';
-                windowEl.style.cursor='move';
-            });
-            document.addEventListener('mousemove',(e)=>{
-                if(!dragActive) return;
-                let newLeft=e.clientX-dragOffsetX;
-                let newTop=e.clientY-dragOffsetY;
-                function triggerHorrorProtocol() {
-                if(isLocked) return;
-                if(isAudioPlaying) stopStatic();
-                playScarySound();
-                darken.style.opacity='0.9';
-                setTimeout(()=>{
-                    flash.style.opacity='1';
-                    setTimeout(()=>{
-                        flash.style.opacity='0';
-                        redTextDiv.style.opacity='1';
-                        document.body.style.backgroundColor='white';
-                        setTimeout(()=>{ playScarySound(); },500);
-                        setTimeout(()=>{
-                            redTextDiv.style.opacity='0';
-                            finalOverlay.style.opacity='1';
-                            document.body.style.backgroundColor='#008080';
-                            redirectToDownload();
-                            lockSiteForever();
-                        },10000);
-                    },150);
-                },500);
-            }
-
-            // ========== 6. Команды терминала ==========
-            const commandInput=document.getElementById('commandInput');
-            const executeBtn=document.getElementById('executeCmd');
-            const historyDiv=document.getElementById('terminalHistory');
-            function addHistoryLine(cmd,resp){
-                const line=document.createElement('div');
-                line.innerHTML=> ${cmd}<br>  ${resp};
-                historyDiv.appendChild(line);
-                historyDiv.scrollTop=historyDiv.scrollHeight;
-                while(historyDiv.children.length>18) historyDiv.removeChild(historyDiv.firstChild);
-            }
-            function processCommand(rawCmd){
-                if(isLocked) return;
-                let cmd=rawCmd.trim().toUpperCase();
-                if(cmd==="") return;
-                const triggers=["ARTEM","ARTEM.EXE","HYPERDRIVE","ANALOG_CRASH"];
-                if(triggers.includes(cmd)){
-                    addHistoryLine(rawCmd,"⚠️ PROTOCOL HYPERDRIVE_CRASH ACTIVATED. SYSTEM UNSTABLE.");
-                    triggerHorrorProtocol();
-                } else {
-                    addHistoryLine(rawCmd,"[ERROR] UNKNOWN COMMAND. Available: ARTEM , ARTEM.EXE , HYPERDRIVE , ANALOG_CRASH");
-                }
-                commandInput.value='';
-            }
-            executeBtn.addEventListener('click',()=>{ if(!isLocked) processCommand(commandInput.value); });
-            commandInput.addEventListener('keypress',(e)=>{ if(e.key==='Enter' && !isLocked){ e.preventDefault(); processCommand(commandInput.value); } });
-
-            // Звуки печати
-            const cmdInput=document.getElementById('commandInput');
-            cmdInput.addEventListener('input',function(e){ if(e.inputType!=='deleteContentBackward' && e.inputType!=='deleteContentForward') playTypingSound(); });
-            cmdInput.addEventListener('keydown',function(e){ if(e.key.length===1 && !e.ctrlKey && !e.altKey) playTypingSound(); });
+            const cmdInputElem=document.getElementById('commandInput');
+            cmdInputElem.addEventListener('input',function(e){ if(e.inputType!=='deleteContentBackward' && e.inputType!=='deleteContentForward') playTypingSound(); });
+            cmdInputElem.addEventListener('keydown',function(e){ if(e.key.length===1 && !e.ctrlKey && !e.altKey) playTypingSound(); });
 
             // ========== 7. Drag окна, иконки ==========
             let dragActive=false, dragOffsetX=0, dragOffsetY=0;
@@ -823,7 +752,7 @@
             const termBox=document.querySelector('.terminal-box');
             function jitterEffect(){
                 if(!isLocked && Math.random()>0.92){
-                    termBox.style.transform=translate(${Math.random()*1.2-0.6}px,${Math.random()*1-0.5}px);
+                    termBox.style.transform=`translate(${Math.random()*1.2-0.6}px,${Math.random()*1-0.5}px)`;
                     setTimeout(()=>{ termBox.style.transform=''; },60);
                 }
             }
@@ -832,4 +761,4 @@
         })();
     </script>
 </body>
-</html> 
+</html>
