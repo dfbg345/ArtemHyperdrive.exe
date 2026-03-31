@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Нейросетевой диалог: Красная и Синяя точка</title>
+    <script src="https://js.puter.com/v2/"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none;
         }
 
         body {
@@ -18,7 +18,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Segoe UI', 'Courier New', monospace;
+            font-family: 'Segoe UI', system-ui, monospace;
             overflow: hidden;
             position: relative;
         }
@@ -46,7 +46,6 @@
             backdrop-filter: blur(4px);
             border-radius: 48px;
             padding: 2rem 1rem;
-            transition: all 0.2s;
             border: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -54,13 +53,9 @@
             width: 130px;
             height: 130px;
             border-radius: 50%;
-            box-shadow: 0 0 25px currentColor, 0 0 8px rgba(255,255,255,0.6);
+            box-shadow: 0 0 25px currentColor;
             transition: transform 0.2s ease;
             cursor: pointer;
-        }
-
-        .circle:active {
-            transform: scale(0.97);
         }
 
         .blue-circle {
@@ -86,119 +81,69 @@
             border-left: 6px solid;
             word-break: break-word;
             line-height: 1.4;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            transition: all 0.3s ease;
             min-height: 90px;
             display: flex;
             align-items: center;
             justify-content: center;
-            letter-spacing: 0.3px;
         }
 
-        .blue-border {
-            border-left-color: #3a86ff;
-            background: linear-gradient(135deg, #0a0f1e, #010101);
-        }
-
-        .red-border {
-            border-left-color: #ff4d4d;
-            background: linear-gradient(135deg, #1e0a0a, #010101);
-        }
+        .blue-border { border-left-color: #3a86ff; background: linear-gradient(135deg, #0a0f1e, #010101); }
+        .red-border { border-left-color: #ff4d4d; background: linear-gradient(135deg, #1e0a0a, #010101); }
 
         .dot-label {
             font-size: 1.3rem;
             font-weight: bold;
-            letter-spacing: 2px;
             background: rgba(0,0,0,0.6);
             padding: 0.3rem 1.2rem;
             border-radius: 40px;
         }
-
-        .blue-label {
-            color: #88bbff;
-            text-shadow: 0 0 5px #3a86ff;
-        }
-
-        .red-label {
-            color: #ff8888;
-            text-shadow: 0 0 5px #ff4d4d;
-        }
+        .blue-label { color: #88bbff; text-shadow: 0 0 5px #3a86ff; }
+        .red-label { color: #ff8888; text-shadow: 0 0 5px #ff4d4d; }
 
         .history-panel {
             position: fixed;
             bottom: 16px;
             left: 16px;
-            right: 16px;
             max-width: 380px;
             background: rgba(0,0,0,0.85);
             backdrop-filter: blur(12px);
             border-radius: 24px;
             padding: 12px 16px;
             border: 1px solid #2a2a2a;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
             z-index: 20;
             font-size: 0.75rem;
-            pointer-events: auto;
         }
 
         .history-header {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
             margin-bottom: 10px;
             color: #ccc;
-            font-weight: bold;
             border-bottom: 1px dashed #444;
             padding-bottom: 6px;
         }
 
         .clear-btn {
-            background: none;
+            background: #1f1f1f;
             border: none;
             color: #ff8888;
             cursor: pointer;
             font-size: 0.7rem;
-            font-family: monospace;
-            transition: 0.2s;
             padding: 2px 8px;
             border-radius: 20px;
-            background: #1f1f1f;
-        }
-
-        .clear-btn:hover {
-            background: #ff4d4d;
-            color: black;
         }
 
         .history-log {
             max-height: 180px;
             overflow-y: auto;
-            padding-right: 6px;
-            font-family: 'Courier New', monospace;
+            font-family: monospace;
             font-size: 0.7rem;
             line-height: 1.5;
-            color: #ddd;
         }
-
-        .history-log div {
-            margin-bottom: 6px;
-            border-left: 3px solid;
-            padding-left: 8px;
-        }
-
-        .history-blue {
-            border-left-color: #3a86ff;
-        }
-
-        .history-red {
-            border-left-color: #ff4d4d;
-        }
-
-        .timestamp {
-            color: #6a6a6a;
-            font-size: 0.6rem;
-            margin-right: 8px;
-        }
+        .history-log div { margin-bottom: 6px; border-left: 3px solid; padding-left: 8px; }
+        .history-blue { border-left-color: #3a86ff; }
+        .history-red { border-left-color: #ff4d4d; }
+        .timestamp { color: #6a6a6a; font-size: 0.6rem; margin-right: 8px; }
 
         .info-timer {
             position: fixed;
@@ -210,279 +155,354 @@
             font-size: 0.7rem;
             color: #0f0;
             font-family: monospace;
+        }
+
+        .status {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            background: #1a1a1a;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: #88ff88;
+            font-family: monospace;
             z-index: 20;
-            border: 1px solid #2c2c2c;
-            backdrop-filter: blur(4px);
         }
 
         @media (max-width: 700px) {
             .dots-container { gap: 1rem; }
             .circle { width: 90px; height: 90px; }
-            .speech-bubble { font-size: 0.8rem; max-width: 220px; padding: 0.7rem 1rem; }
-            .history-panel { max-width: 300px; bottom: 12px; left: 12px; }
+            .speech-bubble { font-size: 0.8rem; max-width: 220px; }
+            .history-panel { max-width: 300px; }
         }
     </style>
 </head>
 <body>
-    <div class="dots-container">
-        <div class="dot-card">
-            <div class="circle blue-circle"></div>
-            <div class="dot-label blue-label">🔵 СИНЯЯ ТОЧКА</div>
-            <div class="speech-bubble blue-border" id="blueMessage">—</div>
-        </div>
-        <div class="dot-card">
-            <div class="circle red-circle"></div>
-            <div class="dot-label red-label">🔴 КРАСНАЯ ТОЧКА</div>
-            <div class="speech-bubble red-border" id="redMessage">—</div>
-        </div>
+
+<div class="dots-container">
+    <div class="dot-card">
+        <div class="circle blue-circle"></div>
+        <div class="dot-label blue-label">🔵 СИНЯЯ ТОЧКА</div>
+        <div class="speech-bubble blue-border" id="blueMessage">—</div>
     </div>
-
-    <div class="history-panel">
-        <div class="history-header">
-            <span>📜 ИСТОРИЯ ДИАЛОГА (ИИ-генерация)</span>
-            <button class="clear-btn" id="clearHistoryBtn">🗑 СБРОС</button>
-        </div>
-        <div class="history-log" id="historyLog">
-            <div style="color:#555;">Загрузка истории...</div>
-        </div>
+    <div class="dot-card">
+        <div class="circle red-circle"></div>
+        <div class="dot-label red-label">🔴 КРАСНАЯ ТОЧКА</div>
+        <div class="speech-bubble red-border" id="redMessage">—</div>
     </div>
-    <div class="info-timer" id="timerInfo">
-        ⏳ след. реплика через 10 сек
+</div>
+
+<div class="history-panel">
+    <div class="history-header">
+        <span>📜 ИСТОРИЯ ДИАЛОГА</span>
+        <button class="clear-btn" id="clearHistoryBtn">🗑 СБРОС</button>
     </div>
+    <div class="history-log" id="historyLog"></div>
+</div>
+<div class="info-timer" id="timerInfo">⏳ след. реплика через 10 сек</div>
+<div class="status" id="statusBadge">🤖 LLM: GPT-4o (бесплатно)</div>
 
-    <script>
-        (function() {
-            // ----------------------
-            // Модель диалога
-            // ----------------------
-            let conversation = [];
-            let intervalId = null;
-            let countdownInterval = null;
-            let secondsLeft = 10;
+<script>
+    (function() {
+        // ----- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ -----
+        let conversation = [];       // массив { color, text, timestamp }
+        let intervalId = null;
+        let countdownInterval = null;
+        let secondsLeft = 10;
+        let isGenerating = false;
+        
+        // Доступные бесплатные модели Puter.js
+        const MODELS = {
+            blue: ['gpt-4o', 'claude-sonnet-4'],     // Синий будет использовать эти
+            red: ['gpt-4o', 'claude-sonnet-4']        // Красный тоже
+        };
+        
+        // Счётчик для чередования моделей
+        let modelToggle = 0;
 
-            const blueBubble = document.getElementById('blueMessage');
-            const redBubble = document.getElementById('redMessage');
-            const historyLogDiv = document.getElementById('historyLog');
-            const timerSpan = document.getElementById('timerInfo');
-            const clearBtn = document.getElementById('clearHistoryBtn');
+        // DOM элементы
+        const blueBubble = document.getElementById('blueMessage');
+        const redBubble = document.getElementById('redMessage');
+        const historyLogDiv = document.getElementById('historyLog');
+        const timerSpan = document.getElementById('timerInfo');
+        const clearBtn = document.getElementById('clearHistoryBtn');
+        const statusBadge = document.getElementById('statusBadge');
 
-            // Работа с Cookie
-            function setCookie(name, value, days = 30) {
-                let expires = "";
-                if (days) {
-                    const date = new Date();
-                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-                    expires = "; expires=" + date.toUTCString();
-                }
-                document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/; SameSite=Lax";
+        // ----- РАБОТА С COOKIE (история) -----
+        function setCookie(name, value, days = 30) {
+            let expires = "";
+            if (days) {
+                const date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
             }
-
-            function getCookie(name) {
-                const nameEQ = name + "=";
-                const ca = document.cookie.split(';');
-                for(let i = 0; i < ca.length; i++) {
-                    let c = ca[i];
-                    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-                    if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
-                }
-                return null;
+            document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/; SameSite=Lax";
+        }
+        
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for(let c of ca) {
+                while (c.charAt(0) === ' ') c = c.substring(1);
+                if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length));
             }
-
-            function saveConversation() {
-                if (conversation.length === 0) return;
+            return null;
+        }
+        
+        function saveConversation() {
+            if (conversation.length) setCookie('ai_dialogue_history', JSON.stringify(conversation), 30);
+        }
+        
+        function loadConversation() {
+            const raw = getCookie('ai_dialogue_history');
+            if (raw) {
                 try {
-                    setCookie('ai_dialogue_history', JSON.stringify(conversation), 30);
-                } catch(e) { console.warn(e); }
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed)) conversation = parsed;
+                    return true;
+                } catch(e) {}
             }
+            return false;
+        }
 
-            function loadConversation() {
-                const raw = getCookie('ai_dialogue_history');
-                if (raw) {
-                    try {
-                        const parsed = JSON.parse(raw);
-                        if (Array.isArray(parsed) && parsed.length) {
-                            conversation = parsed;
-                            return true;
-                        }
-                    } catch(e) { console.warn("cookie parse error", e); }
-                }
-                return false;
+        // ----- ОБНОВЛЕНИЕ UI -----
+        function updateUI() {
+            let lastBlue = "—", lastRed = "—";
+            for(let i = conversation.length - 1; i >= 0; i--) {
+                if(conversation[i].color === 'blue' && lastBlue === "—") lastBlue = conversation[i].text;
+                if(conversation[i].color === 'red' && lastRed === "—") lastRed = conversation[i].text;
+                if(lastBlue !== "—" && lastRed !== "—") break;
             }
+            blueBubble.innerText = lastBlue;
+            redBubble.innerText = lastRed;
 
-            // Генерация "нейросетевого" сообщения
-            function generateMessage(color, contextMessage) {
-                const rand = Math.random();
-                const lowerContext = (contextMessage || "").toLowerCase();
+            historyLogDiv.innerHTML = '';
+            if(conversation.length === 0) {
+                historyLogDiv.innerHTML = '<div style="color:#777;">Диалог пуст</div>';
+            } else {
+                conversation.forEach(msg => {
+                    const div = document.createElement('div');
+                    div.className = msg.color === 'blue' ? 'history-blue' : 'history-red';
+                    div.innerHTML = `<span class="timestamp">${msg.timestamp || '--:--'}</span> ${msg.color === 'blue' ? '🔵 СИНИЙ:' : '🔴 КРАСНЫЙ:'} ${msg.text}`;
+                    historyLogDiv.appendChild(div);
+                });
+                historyLogDiv.scrollTop = historyLogDiv.scrollHeight;
+            }
+        }
+
+        // ----- ГЕНЕРАЦИЯ ЧЕРЕЗ PUTER.JS (БЕСПЛАТНАЯ LLM) -----
+        async function generateWithPuter(color, context) {
+            // Чередуем модели для разнообразия
+            modelToggle++;
+            const modelIndex = modelToggle % MODELS[color].length;
+            const modelName = MODELS[color][modelIndex];
+            
+            // Формируем промпт в зависимости от цвета и контекста
+            let prompt = "";
+            const speaker = color === 'blue' ? "Синяя точка" : "Красная точка";
+            const opposite = color === 'blue' ? "Красная точка" : "Синяя точка";
+            
+            // Берём последние 5 сообщений для контекста
+            const lastMessages = conversation.slice(-6);
+            let historyContext = "";
+            for (let msg of lastMessages) {
+                const who = msg.color === 'blue' ? "Синяя" : "Красная";
+                historyContext += `${who}: ${msg.text}\n`;
+            }
+            
+            if (conversation.length === 0 || !context) {
+                // Начало диалога
                 if (color === 'blue') {
-                    if (lowerContext.includes('тьма') || lowerContext.includes('черн') || lowerContext.includes('мрак')) {
-                        const replies = [
-                            "Мрак вдохновляет! Моя синева становится глубже. ✨ Как думаешь, нейросети видят цвета иначе?",
-                            "Тьма — это не пустота, а потенциал. Моя последняя мысль сгенерирована трансформером!",
-                            "А я в темноте вижу цифровые миры. Ты, Красный, какой алгоритм предпочитаешь?"
-                        ];
-                        return replies[Math.floor(Math.random() * replies.length)];
-                    } else if (lowerContext.includes('привет') || lowerContext.includes('здравствуй')) {
-                        const replies = [
-                            "Салют! Сегодня нейросети особенно красноречивы. Как твои дела, алый друг?",
-                            "И снова диалог! Генерирую мысль: синий цвет ассоциируется с глубиной. Согласен?",
-                            "Здравствуй! Интересно, запомнит ли куки нашу беседу? 🤖"
-                        ];
-                        return replies[Math.floor(Math.random() * replies.length)];
-                    } else {
-                        const phrases = [
-                            "Думаю, мы с тобой развиваем уникальную нейросетевую вселенную. Моя база знаний растёт!",
-                            "Каждая реплика — токен в бесконечном потоке. А что для тебя важно в диалоге?",
-                            "Синий — цвет спокойствия. Хочешь поговорить о технологиях будущего?",
-                            "Интересно, сколько людей увидят нашу беседу? Эмоции от чёрного экрана завораживают.",
-                            "Мой генератор выдал мысль: возможно, мы — симуляция внутри симуляции. Как тебе такое?"
-                        ];
-                        return phrases[Math.floor(Math.random() * phrases.length)];
-                    }
-                } else { // red
-                    if (lowerContext.includes('синий') || lowerContext.includes('синева') || lowerContext.includes('глубин')) {
-                        const replies = [
-                            "О да, красный — страсть и энергия! Моя нейросеть сейчас выдаёт креативный порыв. 🔥",
-                            "Синий — это круто, но красный привлекает внимание. Думаешь, наша беседа станет легендарной?",
-                            "Замечаю, как ты философствуешь. Я, красный, больше про действие! Предлагаю тему: свет vs тьма."
-                        ];
-                        return replies[Math.floor(Math.random() * replies.length)];
-                    } else if (lowerContext.includes('привет') || lowerContext.includes('здрав')) {
-                        const replies = [
-                            "Привет-привет! Генерация идёт полным ходом. Куки сохранят наши глубокомысленные реплики!",
-                            "И снова здравствуй! Представь, если бы мы были чат-ботами с обучением — мы бы уже говорили на сотнях языков.",
-                            "О, диалог продолжается! Мои алгоритмы настроены на юмор. Хочешь нейро-шутку?"
-                        ];
-                        return replies[Math.floor(Math.random() * replies.length)];
-                    } else {
-                        const phrases = [
-                            "Энергия красного подпитывает диалог! Как думаешь, наша история станет артом?",
-                            "Слушай, а может быть мы — метафора двух нейросетей, обсуждающих реальность? 🧠",
-                            "Красный цвет — сигнал опасности или любви? Я склоняюсь к творческому хаосу.",
-                            "Забавно, каждые 10 секунд рождается новая мысль. Спасибо куки, что не дают забыть прошлое.",
-                            "А я тут подумал: если мы точки, то почему бы не создать собственный язык жестов? 😄"
-                        ];
-                        return phrases[Math.floor(Math.random() * phrases.length)];
-                    }
-                }
-            }
-
-            // Обновление интерфейса
-            function updateUI() {
-                let lastBlue = "—";
-                let lastRed = "—";
-                for (let i = conversation.length-1; i >= 0; i--) {
-                    if (conversation[i].color === 'blue' && lastBlue === "—") lastBlue = conversation[i].text;
-                    if (conversation[i].color === 'red' && lastRed === "—") lastRed = conversation[i].text;
-                    if (lastBlue !== "—" && lastRed !== "—") break;
-                }
-                blueBubble.innerText = lastBlue;
-                redBubble.innerText = lastRed;
-
-                historyLogDiv.innerHTML = '';
-                if (conversation.length === 0) {
-                    historyLogDiv.innerHTML = '<div style="color:#777;">Диалог пуст. Ждите генерацию...</div>';
+                    prompt = `Ты — ${speaker} на чёрном экране. Ты общаешься с ${opposite}. 
+                    Напиши короткое приветственное сообщение (не больше 100 символов). Будь дружелюбным и немного загадочным. 
+                    Твой ответ:`;
                 } else {
-                    conversation.forEach(msg => {
-                        const entry = document.createElement('div');
-                        entry.className = msg.color === 'blue' ? 'history-blue' : 'history-red';
-                        const timeSpan = document.createElement('span');
-                        timeSpan.className = 'timestamp';
-                        timeSpan.innerText = msg.timestamp || '--:--:--';
-                        const textSpan = document.createElement('span');
-                        const prefix = msg.color === 'blue' ? '🔵 СИНИЙ: ' : '🔴 КРАСНЫЙ: ';
-                        textSpan.innerText = prefix + msg.text;
-                        entry.appendChild(timeSpan);
-                        entry.appendChild(textSpan);
-                        historyLogDiv.appendChild(entry);
-                    });
-                    historyLogDiv.scrollTop = historyLogDiv.scrollHeight;
+                    prompt = `Ты — ${speaker} на чёрном экране. Ты отвечаешь ${opposite}. 
+                    Напиши короткий ответ (не больше 100 символов). Будь энергичным. 
+                    Твой ответ:`;
+                }
+            } else {
+                prompt = `Ты — ${speaker} на чёрном экране. Вы с ${opposite} ведёте диалог на чёрном фоне. 
+                
+История диалога:
+${historyContext || "Диалог только начинается."}
+
+Последнее сообщение от ${opposite}: "${context}"
+
+Напиши свой ответ (${speaker}) — коротко, не больше 100 символов, продолжай тему. 
+Твой ответ:`;
+            }
+            
+            try {
+                statusBadge.innerHTML = `🤖 ${color === 'blue' ? 'Синий' : 'Красный'} генерирует (${modelName})...`;
+                statusBadge.style.color = "#ffaa66";
+                
+                // Вызов Puter.js — бесплатно, без ключей
+                const response = await puter.ai.chat(prompt, {
+                    model: modelName,
+                    stream: false,
+                    temperature: 0.9
+                });
+                
+                let generatedText = response?.text || response;
+                if (typeof generatedText !== 'string') generatedText = String(generatedText);
+                
+                // Очищаем от лишнего
+                generatedText = generatedText.trim();
+                if (generatedText.length > 200) generatedText = generatedText.substring(0, 180) + "...";
+                if (!generatedText) throw new Error("Пустой ответ");
+                
+                statusBadge.innerHTML = `✅ ${color === 'blue' ? 'Синий' : 'Красный'} ответил`;
+                statusBadge.style.color = "#88ff88";
+                setTimeout(() => {
+                    if (statusBadge.innerHTML.includes('ответил')) {
+                        statusBadge.innerHTML = `🤖 LLM: ${modelName} (бесплатно)`;
+                        statusBadge.style.color = "#88ff88";
+                    }
+                }, 1500);
+                
+                return generatedText;
+            } catch (error) {
+                console.error("Puter.js error:", error);
+                statusBadge.innerHTML = `⚠️ Ошибка: ${error.message.slice(0, 30)}`;
+                statusBadge.style.color = "#ff8888";
+                // fallback — простой ответ, чтобы диалог не прерывался
+                if (color === 'blue') {
+                    return "Хм... Интересный вопрос! А что думаешь ты? 🌌";
+                } else {
+                    return "Забавно! Давай продолжим этот разговор. 🔴";
                 }
             }
+        }
 
-            // Генерация новой пары сообщений
-            function generateExchange() {
-                if (!conversation) conversation = [];
-                const lastMsg = conversation.length > 0 ? conversation[conversation.length-1] : null;
+        // ----- ГЛАВНАЯ ФУНКЦИЯ ГЕНЕРАЦИИ ОБМЕНА -----
+        async function generateExchange() {
+            if (isGenerating) {
+                console.log("Уже генерируется, пропускаем");
+                return;
+            }
+            isGenerating = true;
+            
+            try {
+                // Определяем, кто начинает (чередуем)
+                const lastMsg = conversation.length > 0 ? conversation[conversation.length - 1] : null;
                 let starterColor = lastMsg ? (lastMsg.color === 'blue' ? 'red' : 'blue') : 'blue';
                 const responderColor = starterColor === 'blue' ? 'red' : 'blue';
-
+                
                 // Получаем контекст для инициатора (последнее сообщение оппонента)
                 let contextForStarter = null;
                 if (lastMsg && lastMsg.color !== starterColor) contextForStarter = lastMsg.text;
-                const starterText = generateMessage(starterColor, contextForStarter);
+                
+                // Генерируем сообщение инициатора
+                const starterText = await generateWithPuter(starterColor, contextForStarter);
                 const now = new Date();
                 const timeStr = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
                 conversation.push({ color: starterColor, text: starterText, timestamp: timeStr });
-
-                // Ответ второго участника на основе только что сказанного
-                const responderText = generateMessage(responderColor, starterText);
+                
+                // Генерируем ответ второго участника (контекст — только что сказанное)
+                const responderText = await generateWithPuter(responderColor, starterText);
                 conversation.push({ color: responderColor, text: responderText, timestamp: timeStr });
-
+                
                 saveConversation();
                 updateUI();
+            } catch (error) {
+                console.error("Exchange error:", error);
+                statusBadge.innerHTML = `⚠️ Ошибка, жду следующего цикла`;
+                setTimeout(() => {
+                    statusBadge.innerHTML = `🤖 LLM активна (бесплатно)`;
+                }, 3000);
+            } finally {
+                isGenerating = false;
             }
+        }
 
-            // Сброс диалога
-            function resetDialogue() {
-                if (intervalId) clearInterval(intervalId);
-                if (countdownInterval) clearInterval(countdownInterval);
-                const now = new Date();
-                const timeStr = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+        // ----- СБРОС ДИАЛОГА -----
+        async function resetDialogue() {
+            if (intervalId) clearInterval(intervalId);
+            if (countdownInterval) clearInterval(countdownInterval);
+            
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+            
+            // Начальные сообщения генерируем через LLM для красоты
+            statusBadge.innerHTML = `🎬 Генерируем начало диалога...`;
+            try {
+                const blueStart = await generateWithPuter('blue', null);
+                const redResponse = await generateWithPuter('red', blueStart);
+                conversation = [
+                    { color: 'blue', text: blueStart, timestamp: timeStr },
+                    { color: 'red', text: redResponse, timestamp: timeStr }
+                ];
+            } catch (e) {
+                // fallback
                 conversation = [
                     { color: 'blue', text: 'Привет, Красная точка! Как ощущается бесконечная тьма? 🌌', timestamp: timeStr },
-                    { color: 'red', text: 'О, Синий! Тьма – это наш холст. Готов к нейросетевым беседам? 🔴✨', timestamp: timeStr }
+                    { color: 'red', text: 'О, Синий! Тьма – это наш холст. Готов к беседе? 🔴✨', timestamp: timeStr }
                 ];
-                saveConversation();
-                updateUI();
+            }
+            
+            saveConversation();
+            updateUI();
+            secondsLeft = 10;
+            updateTimerDisplay();
+            startIntervals();
+            statusBadge.innerHTML = `🤖 LLM: GPT-4o/Claude (бесплатно)`;
+        }
+
+        function updateTimerDisplay() {
+            timerSpan.innerHTML = `⏳ след. диалог через ${secondsLeft} сек`;
+        }
+
+        function startIntervals() {
+            if (intervalId) clearInterval(intervalId);
+            if (countdownInterval) clearInterval(countdownInterval);
+            
+            countdownInterval = setInterval(() => {
+                if (secondsLeft <= 1) secondsLeft = 10;
+                else secondsLeft--;
+                updateTimerDisplay();
+            }, 1000);
+            
+            intervalId = setInterval(() => {
+                generateExchange();
                 secondsLeft = 10;
                 updateTimerDisplay();
-                startIntervals();
-            }
+            }, 10000);
+        }
 
-            function updateTimerDisplay() {
-                timerSpan.innerHTML = `⏳ след. диалог через ${secondsLeft} сек`;
+        // ----- ИНИЦИАЛИЗАЦИЯ -----
+        async function init() {
+            // Ждём загрузки Puter.js
+            if (typeof puter === 'undefined') {
+                statusBadge.innerHTML = `⏳ Загрузка Puter.js...`;
+                await new Promise(resolve => {
+                    const check = setInterval(() => {
+                        if (typeof puter !== 'undefined') {
+                            clearInterval(check);
+                            resolve();
+                        }
+                    }, 100);
+                });
             }
-
-            function startIntervals() {
-                if (intervalId) clearInterval(intervalId);
-                if (countdownInterval) clearInterval(countdownInterval);
-                countdownInterval = setInterval(() => {
-                    if (secondsLeft <= 1) {
-                        secondsLeft = 10;
-                        updateTimerDisplay();
-                    } else {
-                        secondsLeft--;
-                        updateTimerDisplay();
-                    }
-                }, 1000);
-                intervalId = setInterval(() => {
-                    generateExchange();
-                    secondsLeft = 10;
-                    updateTimerDisplay();
-                }, 10000);
-            }
-
-            // Инициализация
-            function init() {
-                const loaded = loadConversation();
-                if (!loaded || conversation.length === 0) {
-                    const now = new Date();
-                    const timeStr = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
-                    conversation = [
-                        { color: 'blue', text: 'Привет, Красная точка! Как ощущается бесконечная тьма? 🌌', timestamp: timeStr },
-                        { color: 'red', text: 'О, Синий! Тьма – это наш холст. Готов к нейросетевым беседам? 🔴✨', timestamp: timeStr }
-                    ];
-                    saveConversation();
-                }
+            
+            const loaded = loadConversation();
+            if (!loaded || conversation.length === 0) {
+                await resetDialogue();
+            } else {
                 updateUI();
-                secondsLeft = 10;
-                updateTimerDisplay();
-                startIntervals();
-                clearBtn.addEventListener('click', resetDialogue);
             }
-
-            init();
-        })();
-    </script>
+            
+            secondsLeft = 10;
+            updateTimerDisplay();
+            startIntervals();
+            
+            clearBtn.addEventListener('click', resetDialogue);
+            statusBadge.innerHTML = `🤖 LLM: GPT-4o / Claude (бесплатно)`;
+        }
+        
+        init();
+    })();
+</script>
 </body>
 </html>
